@@ -19,7 +19,111 @@
             margin: 0; padding: 10px;
             font-family: "STKaiti", "KaiTi", "楷体", serif;
             display: flex; justify-content: center;
+            /* 防止开屏时页面滚动 */
+            overflow: hidden; 
+            animation: enableScroll 0s 4s forwards;
         }
+
+        /* --- 开屏动画样式开始 --- */
+        #opening-screen {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: radial-gradient(circle at center, #d72626 0%, #8a0d0d 100%);
+            z-index: 9999;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            color: #fceea7;
+            text-align: center;
+            /* 整个屏幕在3.2秒后开始淡出，耗时0.8秒 */
+            animation: screenFadeOut 0.8s ease-in-out 3.2s forwards;
+        }
+
+        .os-year {
+            font-family: "Microsoft YaHei", sans-serif;
+            font-size: 80px;
+            font-weight: bold;
+            line-height: 1;
+            letter-spacing: 5px;
+            opacity: 0;
+            text-shadow: 0 4px 10px rgba(0,0,0,0.3);
+            background: linear-gradient(to bottom, #fffacd, #e6c15c);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            /* 动画：下沉浮现 */
+            animation: textFloatUp 1.2s cubic-bezier(0.2, 0.8, 0.2, 1) 0.5s forwards;
+        }
+
+        .os-greeting {
+            font-family: "STXingkai", "华文行楷", "KaiTi", cursive;
+            font-size: 45px;
+            margin-top: 20px;
+            opacity: 0;
+            text-shadow: 0 2px 5px rgba(0,0,0,0.2);
+            /* 动画：上浮浮现 */
+            animation: textFloatUp 1.2s cubic-bezier(0.2, 0.8, 0.2, 1) 0.8s forwards;
+        }
+
+        /* 修复断行问题的部分 */
+        .os-sub {
+            font-family: "STKaiti", "KaiTi", serif;
+            font-size: 18px;
+            margin-top: 30px;
+            opacity: 0;
+            letter-spacing: 8px;
+            border-top: 1px solid rgba(255,255,255,0.3);
+            padding-top: 15px;
+            
+            /* 关键修改：去掉固定宽度，强制不换行，增加内边距 */
+            width: auto;
+            white-space: nowrap;
+            padding-left: 10px;
+            padding-right: 10px;
+
+            /* 动画：淡入 */
+            animation: simpleFadeIn 1.5s ease 1.2s forwards;
+        }
+
+        /* 装饰用的光点 */
+        .sparkle {
+            position: absolute;
+            width: 4px; height: 4px;
+            background: #fff;
+            border-radius: 50%;
+            box-shadow: 0 0 10px #fff;
+            opacity: 0;
+            animation: sparkleAnim 2s infinite;
+        }
+
+        /* 关键帧定义 */
+        @keyframes textFloatUp {
+            from { opacity: 0; transform: translateY(30px) scale(0.9); }
+            to { opacity: 1; transform: translateY(0) scale(1); }
+        }
+
+        @keyframes simpleFadeIn {
+            from { opacity: 0; }
+            to { opacity: 0.8; }
+        }
+
+        @keyframes screenFadeOut {
+            0% { opacity: 1; visibility: visible; }
+            99% { opacity: 0; visibility: visible; }
+            100% { opacity: 0; visibility: hidden; pointer-events: none; }
+        }
+
+        @keyframes enableScroll {
+            to { overflow: auto; }
+        }
+        
+        @keyframes sparkleAnim {
+            0% { transform: scale(0); opacity: 0; }
+            50% { opacity: 1; }
+            100% { transform: scale(1.5); opacity: 0; }
+        }
+        /* --- 开屏动画样式结束 --- */
+
 
         .letter-wrap {
             max-width: 750px; 
@@ -30,6 +134,15 @@
             box-shadow: 0 10px 30px rgba(0,0,0,0.1);
             border: 1px solid #d4c5af;
             box-sizing: border-box;
+            
+            /* 初始稍作隐藏，等开屏结束后浮现 */
+            opacity: 0;
+            transform: translateY(20px);
+            animation: letterAppear 1s ease-out 3.6s forwards;
+        }
+
+        @keyframes letterAppear {
+            to { opacity: 1; transform: translateY(0); }
         }
 
         /* 红色直角花边 */
@@ -60,18 +173,17 @@
             color: #1a1a1a;
             margin-bottom: 15px;
             display: flex;
-            align-items: flex-end; /* 确保名字和后面的字底部对齐 */
+            align-items: flex-end; 
             flex-wrap: wrap;
         }
 
-        /* 重点：手写姓名样式 */
         .handwritten-name {
             font-family: "STXingkai", "华文行楷", "STKaiti", "KaiTi", cursive;
-            font-size: 38px; /* 显著放大 */
+            font-size: 38px; 
             color: #1a1a1a;
             margin-right: 10px;
             line-height: 1;
-            font-weight: normal; /* 手写体不需要太粗，自然最美 */
+            font-weight: normal; 
             display: inline-block;
         }
 
@@ -146,11 +258,28 @@
             .org-name { font-size: 18px; }
             .team-seal { width: 130px; }
             .wish-list { font-size: 15px; }
-            .handwritten-name { font-size: 32px; } /* 手机端稍微缩小一点名字 */
+            .handwritten-name { font-size: 32px; }
+            
+            /* 手机端开屏字体调整 */
+            .os-year { font-size: 60px; }
+            .os-greeting { font-size: 36px; }
         }
     </style>
 </head>
 <body>
+
+    <!-- 开屏动画容器 -->
+    <div id="opening-screen">
+        <div class="os-year">2026</div>
+        <div class="os-greeting">新年快乐</div>
+        <div class="os-sub">前途似海 · 来日方长</div>
+        
+        <!-- 装饰光点 -->
+        <div class="sparkle" style="top: 20%; left: 20%; animation-delay: 0.2s"></div>
+        <div class="sparkle" style="top: 30%; right: 25%; animation-delay: 0.5s"></div>
+        <div class="sparkle" style="top: 70%; left: 15%; animation-delay: 1.1s"></div>
+        <div class="sparkle" style="top: 60%; right: 15%; animation-delay: 0.8s"></div>
+    </div>
 
     <div class="letter-wrap">
         <div class="corner top-left"></div>
@@ -160,7 +289,6 @@
 
         <div class="header-decor">—— 贰零贰陆 · 岁序更替 华章日新 ——</div>
 
-        <!-- 这里保持 id 即可，JS 会自动填充 -->
         <div class="greeting" id="userName">正在加载...</div>
 
         <div class="content">
@@ -193,11 +321,8 @@
             return urlParams.get(name) || "战友";
         }
         
-        // 修改这里的逻辑：使用 innerHTML 插入带样式的 span
         const nameVal = getParam('n');
         document.getElementById('userName').innerHTML = `<span class="handwritten-name">${nameVal}</span> 同学你好：`;
     </script>
 </body>
 </html>
-
-
